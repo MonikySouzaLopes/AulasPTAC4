@@ -12,7 +12,6 @@ export default function Home() {
                 <p>Fazer Login!</p>
             </Link>
         </button>
-        </center>
       </div>
   );
 }
