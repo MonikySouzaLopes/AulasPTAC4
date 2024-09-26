@@ -1,3 +1,45 @@
-.input{
+
+  .input {
+    width: 300px;
+    padding: 10px;
+    margin: 5px;
+    border: 2px solid #555;
+    border-radius: 5px;
+    background-color: #222;
+    color: white;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: #00bfff;
+  }
+  
+  .button {
+    width: 150px;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #00bfff;
+    border: none;
+    border-radius: 5px;
     color: black;
-}
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .button:hover {
+    background-color: #008fbf;
+  }
+  
+  .p {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .center {
+    text-align: center;
+    margin-top: 50px;
+    color: #f0f0f0;
+    font-size: 2rem;
+  }
+  

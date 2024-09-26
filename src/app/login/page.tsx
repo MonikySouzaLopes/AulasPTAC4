@@ -20,7 +20,9 @@ export default function Login(){
 
     return(
         <div>
-           <center><h1>LOGIN</h1></center> 
+           <h1 className={styles.center}>PÁGINA PARA LOGIN</h1>
+           <br />
+           <center>
            <input
         className={styles.input}
         type="email"
@@ -39,8 +41,9 @@ export default function Login(){
       />
       <br />
       <br />
-      <button onClick={login}>Login</button>
-      {errologin && <p>{errologin}</p>}
+      <button className={styles.button} onClick={login}>Login</button>
+      {errologin && <p className={styles.p}>{errologin}</p>}
+      </center>
     </div>
         
     )
