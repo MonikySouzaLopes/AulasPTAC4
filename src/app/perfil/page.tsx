@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import PerfilUsuario from '../interfaces/usuario';
 
 
@@ -8,6 +7,10 @@ const PaginaPerfil = () =>{
         nome: 'Maria Eduarda Bazilio',
         idade: 18,
         email: 'mariaeduarda@gmail.com',
+        password: '12345678',
+        id: 1,
+        tipo: 'adm'
+
     }
     return (
         <div>
