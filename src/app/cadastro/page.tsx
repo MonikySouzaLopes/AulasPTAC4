@@ -14,7 +14,7 @@ export default function Cadastro() {
   });
 
   const rota = () => {
-    router.push('/');
+    router.push('/login');
   };
 
   const alterarNome = (novoNome: string) => {
@@ -40,33 +40,36 @@ export default function Cadastro() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.center}>PÁGINA PARA CADASTRO</h1>
-      <form>
-        <label>Nome:</label>
+      <h1 className={styles.h1}>PÁGINA PARA CADASTRO</h1>
+      <form className={styles.form}>
+        <label className={styles.label}>Nome:</label>
         <input
+          className={styles.input}
           type="text"
           id="nome"
           placeholder="Digite seu nome"
           value={usuario.nome}
           onChange={(e) => alterarNome(e.target.value)}
         />
-        <label htmlFor="email">Email:</label>
+        <label className={styles.label} htmlFor="email">Email:</label>
         <input
+          className={styles.input}
           type="text"
           id="email"
           placeholder="Digite seu email"
           value={usuario.email}
           onChange={(e) => alterarEmail(e.target.value)}
         />
-        <label htmlFor="senha">Senha:</label>
+        <label className={styles.label} htmlFor="senha">Senha:</label>
         <input
+          className={styles.input}
           type="text"
           id="password"
           placeholder="Digite sua senha"
           value={usuario.password}
           onChange={(e) => alterarSenha(e.target.value)}
         />
-        <button type="button" onClick={rota}>
+        <button className={styles.button} type="button" onClick={rota}>
           Login
         </button>
       </form>

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from "./login.module.css";
 import Button from "../componentes/button";
+import Link from "next/link";
 
 export default function Login(){
     const router = useRouter();
@@ -47,7 +48,14 @@ export default function Login(){
       <br />
       <button className={styles.button} onClick={login}>Login</button>
       {errologin && <p className={styles.p}>{errologin}</p>}
+        <br />
+        <button className={styles.button}>
+        <Link  href={"/cadastro/"}>
+                <p>Fazer Cadastro!</p>
+            </Link>
+        </button>
       </center>
+      
     </div>
         
     )
