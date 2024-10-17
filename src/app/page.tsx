@@ -14,6 +14,11 @@ export default function Home() {
             </Link>
         </button>
         <br />
+        <button className={styles.button}>
+        <Link  href={"/cadastro/"}>
+                <p>Fazer Cadastro!</p>
+            </Link>
+        </button>
         </center>
       </div>
   );
