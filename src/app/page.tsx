@@ -6,8 +6,10 @@ export default function Home() {
   return (
     <div>
       <center>
-      <h1 className={styles.center}>Página Home</h1>
+      <h1 className={styles.center}>GUSTEAU`S</h1>
+      <h3>Cantina Italiana</h3>
       <br />
+      <h2>Faça sua reserva!</h2>
       <button className={styles.button}>
         <Link  href={"/login/"}>
                 <p>Fazer Login!</p>
