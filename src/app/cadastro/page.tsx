@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Usuario from '../interfaces/usuario2';
 import styles from "./page.module.css"; 
+import NavBar from '../componentes/navbar';
 
 export default function Cadastro() {
   const router = useRouter();
@@ -39,6 +40,8 @@ export default function Cadastro() {
   };
 
   return (
+    <div>
+      <NavBar/>
     <div className={styles.container}>
       <h1 className={styles.h1}>PÁGINA PARA CADASTRO</h1>
       <form className={styles.form}>
@@ -73,6 +76,7 @@ export default function Cadastro() {
           Login
         </button>
       </form>
+    </div>
     </div>
   );
 }

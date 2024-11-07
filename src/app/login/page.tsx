@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import styles from "./login.module.css";
 import Link from "next/link";
 import Image from "next/image";
+import NavBar from '../componentes/navbar';
 
 export default function Login(){
     const router = useRouter();
@@ -22,6 +23,7 @@ export default function Login(){
 
     return(
         <div>
+          <NavBar/>
            <h1 className={styles.center}>PÁGINA PARA LOGIN</h1>
            <br />
            <center>
