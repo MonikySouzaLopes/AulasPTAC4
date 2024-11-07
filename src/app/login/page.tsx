@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from "./login.module.css";
-import Button from "../componentes/button";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Login(){
     const router = useRouter();
@@ -22,9 +22,6 @@ export default function Login(){
 
     return(
         <div>
-            <Button 
-            name="Info 6B"
-            numero={1}/>
            <h1 className={styles.center}>PÁGINA PARA LOGIN</h1>
            <br />
            <center>

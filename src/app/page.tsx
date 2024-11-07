@@ -1,22 +1,15 @@
-import Image from "next/image";
-import Link from "next/link";
-import styles from "./home.module.css"
 
+import NavBar from "./componentes/navbar";
+import styles from "./home.module.css";
+import Image from "next/image";
 export default function Home() {
   return (
     <div>
+      <NavBar />
       <center>
-      <h1 className={styles.center}>GUSTEAU`S</h1>
-      <h3>Cantina Italiana</h3>
-      <br />
-      <h2>Faça sua reserva!</h2>
-      <button className={styles.button}>
-        <Link  href={"/login/"}>
-                <p>Fazer Login!</p>
-            </Link>
-        </button>
-        <br />
-        </center>
-      </div>
+      <Image src="/imagem.png" alt="Imagem 2" width={1400} height={1} />
+      </center>
+      
+    </div>
   );
 }
