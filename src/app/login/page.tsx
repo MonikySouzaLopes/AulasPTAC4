@@ -1,26 +1,49 @@
 'use client'
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import {ApiURL} from '../config'
 import styles from "./login.module.css";
 import Link from "next/link";
-import Image from "next/image";
 import NavBar from '../componentes/navbar';
 
 export default function Login(){
     const router = useRouter();
     const [email, setEmail] = useState('');
-    const [senha, setSenha] = useState('');
+    const [password, setPassword] = useState('');
     const [errologin, setErroLogin] = useState('')
 
     const login = () =>{
       
-        if(email === 'estudanteIfms@gmail.com' && senha === 'ifms2024'){
+        if(email === 'estudanteIfms@gmail.com' && password === 'ifms2024'){
             router.push('/');
         }else{
             setErroLogin('Email ou/e senha incorretos');
         }
     };
 
+    try{
+      const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+  
+        const response = await fetch(`${ApiURL}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type' : 'application.json'
+          },
+          body: JSON.stringify({email, password})
+        });
+        if(response){
+          console.log(response)
+        }
+        
+        console.log('Email:', email);
+        console.log('Senha:', password);
+      }
+  
+    }catch(error){
+      console.error('Erro na requisicao', error)
+    }
+    
     return(
         <div>
           <NavBar/>
@@ -40,8 +63,8 @@ export default function Login(){
         className={styles.input}
         type="password"
         placeholder="Digite sua senha"
-        value={senha}
-        onChange={(e) => setSenha(e.target.value)}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
       <br />
       <br />

@@ -1,0 +1,1 @@
+export const ApiURL: string = 'localhost:8000'
