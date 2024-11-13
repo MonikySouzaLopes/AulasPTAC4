@@ -40,6 +40,21 @@ export default function Home() {
         </p>
       </div>
     </div>
+    <div className={styles.card}>
+      <Image
+        src="/comida.jpeg"
+        alt="Restaurante Gusteau"
+        width={400}
+        height={250}
+        className={styles.cardImage}
+      />
+      <div className={styles.cardContent}>
+        <h2 className={styles.cardTitle}>Prato da casa: Ratatouille</h2>
+        <p className={styles.cardDescription}>
+          Viva uma experiência gastronômica única provando o nosso prato da casa.
+        </p>
+      </div>
+    </div>
     </div>
   );
 }
