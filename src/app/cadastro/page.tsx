@@ -58,8 +58,9 @@ export default function Cadastro() {
         },
         body: JSON.stringify(usuario),
       });
-
+      console.log(usuario)
       console.log(response)
+    
 
       if (!response.ok) {
         throw new Error('Falha na requisição. Verifique o servidor.');

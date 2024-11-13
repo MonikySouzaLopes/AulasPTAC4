@@ -86,7 +86,7 @@ export default function Login() {
             }}
           />
           <br /><br />
-          <button type="submit" className={styles.button}>Login</button>
+          <button type="submit" className={styles.button}>Entrar</button>
           {errologin && <p className={styles.p}>{errologin}</p>}
           <br />
           <Link href="/cadastro">

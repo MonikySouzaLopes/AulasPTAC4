@@ -18,7 +18,7 @@ export default function NavBar() {
       </div>
       <button className={styles.button}>
         <Link  href={"/login/"}>
-                <p>Fazer Login!</p>
+                <p>Login</p>
             </Link>
         </button>
     </nav>
