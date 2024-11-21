@@ -2,6 +2,7 @@
 import PerfilDaReserva from '../interfaces/reserva';
 
 
+
 const PaginaReserva = () =>{
     const reserva = {
         id: 1,
@@ -14,8 +15,8 @@ const PaginaReserva = () =>{
     }
     return (
         <div>
-            <h1>Página Reserva</h1>
-            <PerfilDaReserva reserva={reserva}/>
+            <h1>FAÇA SUA RESERVA AQUI!</h1>
+            
          
         </div>
     )
