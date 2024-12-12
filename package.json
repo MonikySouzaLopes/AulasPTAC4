@@ -11,6 +11,7 @@
   "dependencies": {
     "@types/react-slick": "^0.23.13",
     "cors": "^2.8.5",
+    "json-server": "^1.0.0-beta.3",
     "next": "^14.2.13",
     "nookies": "^2.5.2",
     "react": "^18.3.1",
