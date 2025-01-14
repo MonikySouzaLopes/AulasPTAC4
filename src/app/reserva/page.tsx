@@ -6,16 +6,38 @@ import NavBar from '../componentes/navbar';
 import Mesa from "../interfaces/mesa";
 export default function Home() {
 const [mesas, setMesas] = useState<Mesa>();
+const [reserva, setReserva] = useState<Reserva[]>([])
+const [formReserva, setFormReserva] = useState<Reserva>({
+  id: 0;
+  usuario_id: 0;
+  mesa_id: 0;
+  data: "";
+  n_pessoas: 0;
+  status: true
+
+})
+
+function alterFormReserva <K extends keyof Reservas> (key: K, value: Reservas[K]){
+  setFormReserva( (prevForm) => ({
+    ...prevForm,
+    [key] : value 
+  }))
+}
   
 useEffect(() => {
-
     async function fetchData(){
-      const response = await fetch('http://localhost:3333/reservas')
-      const data = await response.json()
-      setMesas(data.mesas)
+      const responseReserva = await fetch('http://localhost:3333/reservas')
+      const responseMesa = await fetch('http://localhost:3333/reservas')
+      const dataReserva = await responseReserva.json()
+      const dataMesa = await responseMesa.json()
+
+      setMesas(dataMesa)
+      setMesas(dataReserva)
     }
+    fetchData()
+    }, [])
  
-  })
+  
 
   function getDateNow (){
     const today = new Date()
@@ -42,6 +64,12 @@ useEffect(() => {
   function handleChangeDate (e: ChangeEvent<HTMLInputElement>) {
     setDateTables(e.target.value)
   }
+
+async function handleSubmitFor(e: FormEvent) {
+  e.preventDefault()
+  console.log(formReserva)
+}
+
   return (
     <div>
       <NavBar/>
@@ -79,7 +107,7 @@ useEffect(() => {
               <button
                 key={table.id}
                 className="p-4 text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:bg-red-700"
-                onClick={() => setSelectedTable(table.nome)}
+             
               >
                 {table.nome}
               </button>
@@ -89,7 +117,10 @@ useEffect(() => {
             <button
               key={table.id}
               className="p-4 text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:outline-none focus:bg-indigo-700"
-              onClick={() => setSelectedTable(table.nome)}
+              onClick={() => {
+                alterFormReserva("mesa_id", table.id)
+                setSelectedTable(table.nome)
+              }}
             >
               {table.nome}
             </button>
@@ -100,13 +131,14 @@ useEffect(() => {
         {selectedTable ? (
           <div>
             <h2 className="text-xl font-bold mb-4">Reservar {selectedTable}</h2>
-            <form className="flex flex-col space-y-4">
+            <form className="flex flex-col space-y-4" onSubmit={handleSubmitFor}>
               <label className="flex flex-col">
-                Nome:
+                User ID:
                 <input
-                  type="text"
+                  type="number"
                   className="p-2 border rounded"
-                  placeholder="Seu nome"
+                  placeholder="ID"
+                  onChange={(e) => alterFormReserva("usuario_id", parseInt(e.target.value))}
                 />
               </label>
               <label className="flex flex-col">
@@ -114,6 +146,7 @@ useEffect(() => {
                 <input
                   type="date"
                   className="p-2 border rounded"
+                  onChange={(e) => alterFormReserva("data", e.target.value)}
                 />
               </label>
               <label className="flex flex-col">
@@ -122,7 +155,7 @@ useEffect(() => {
                   type="number"
                   max={4}
                   min={1}
-                
+                  onChange={(e) => alterFormReserva("n_pessoas", parseInt(e.target.value))}
                   className="p-2 border rounded"
                 />
               </label>
