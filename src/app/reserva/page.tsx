@@ -4,41 +4,42 @@ import { stringify } from "querystring";
 import { ChangeEvent, useEffect, useState } from "react";
 import NavBar from '../componentes/navbar';
 import Mesa from "../interfaces/mesa";
+
 export default function Home() {
 const [mesas, setMesas] = useState<Mesa>();
 const [reserva, setReserva] = useState<Reserva[]>([])
 const [formReserva, setFormReserva] = useState<Reserva>({
-  id: 0;
-  usuario_id: 0;
-  mesa_id: 0;
-  data: "";
-  n_pessoas: 0;
+  id: 0,
+  usuario_id: 0,
+  mesa_id: 0,
+  data: getDateNow(),
+  n_pessoas: 0,
   status: true
 
 })
 
-function alterFormReserva <K extends keyof Reservas> (key: K, value: Reservas[K]){
+function alterFormReserva <K extends keyof Reserva> (key: K, value: Reservas[K]){
   setFormReserva( (prevForm) => ({
     ...prevForm,
     [key] : value 
   }))
 }
   
-useEffect(() => {
-    async function fetchData(){
-      const responseReserva = await fetch('http://localhost:3333/reservas')
-      const responseMesa = await fetch('http://localhost:3333/reservas')
-      const dataReserva = await responseReserva.json()
-      const dataMesa = await responseMesa.json()
+async function fetchData(){
+  const responseReserva = await fetch('http://localhost:3333/reservas')
+  const responseMesa = await fetch('http://localhost:3333/reservas')
+  const dataReserva = await responseReserva.json()
+  const dataMesa = await responseMesa.json()
 
-      setMesas(dataMesa)
-      setMesas(dataReserva)
-    }
+  setMesas(dataMesa)
+  setMesas(dataReserva)
+}
+
+useEffect(() => {
     fetchData()
     }, [])
  
   
-
   function getDateNow (){
     const today = new Date()
     return today.toISOString().split("T")[0]
@@ -63,11 +64,18 @@ useEffect(() => {
   }]
   function handleChangeDate (e: ChangeEvent<HTMLInputElement>) {
     setDateTables(e.target.value)
+    alterFormReserva("data", e.target.value)
   }
 
 async function handleSubmitFor(e: FormEvent) {
   e.preventDefault()
   console.log(formReserva)
+  await fetch('http://localhost:3333/reserva', {
+    method: 'POST'
+    body: JSON.stringify(formReserva)
+  })
+
+  fetchData();
 }
 
   return (
@@ -139,14 +147,6 @@ async function handleSubmitFor(e: FormEvent) {
                   className="p-2 border rounded"
                   placeholder="ID"
                   onChange={(e) => alterFormReserva("usuario_id", parseInt(e.target.value))}
-                />
-              </label>
-              <label className="flex flex-col">
-                Data:
-                <input
-                  type="date"
-                  className="p-2 border rounded"
-                  onChange={(e) => alterFormReserva("data", e.target.value)}
                 />
               </label>
               <label className="flex flex-col">
