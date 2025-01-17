@@ -10,7 +10,7 @@ const [mesas, setMesas] = useState<Mesa>();
 useEffect(() => {
 
     async function fetchData(){
-      const response = await fetch('http://localhost:3333/reservas')
+      const response = await fetch('http://localhost:8000/reservas')
       const data = await response.json()
       setMesas(data.mesas)
     }
