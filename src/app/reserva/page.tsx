@@ -35,32 +35,40 @@ export default function Home() {
   async function fetchData() {
     setLoading(true);
     try {
+      // Busca as mesas
       const responseMesas = await fetch("http://localhost:8000/mesas");
-      const responseReservas = await fetch("http://localhost:8000/reservas", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-
-      if (!responseMesas.ok || !responseReservas.ok) {
-        throw new Error("Erro ao buscar dados.");
-      }
-
+      if (!responseMesas.ok) throw new Error("Erro ao buscar mesas.");
+  
       const mesasData = await responseMesas.json();
+      setMesas(mesasData.mesas || mesasData); // Garante que seja um array
+  
+      // Verifica se o usuário é administrador
+      const token = localStorage.getItem("token");
+      const responseReservas = isAdmin
+        ? await fetch(
+            `http://localhost:8000/reservas/list?data=${dateTables}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
+        : await fetch("http://localhost:8000/reservas", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+  
+      if (!responseReservas.ok) throw new Error("Erro ao buscar reservas.");
+  
       const reservasData = await responseReservas.json();
-
-      console.log("Mesas recebidas:", mesasData); // Debug
-      console.log("Reservas recebidas:", reservasData); // Debug
-
-      setMesas(mesasData.mesas || mesasData); // Garante que é um array
       setReservas(reservasData.reservas || []);
-      setIsAdmin(reservasData.isAdmin || false); // Define se é admin
+      setIsAdmin(reservasData.isAdmin || false);
     } catch (error) {
       console.error("Erro ao buscar dados:", error.message);
-      setMesas([]); // Garante que `mesas` seja um array em caso de erro
+      setMesas([]);
       setReservas([]);
     } finally {
-      setLoading(false); // Finaliza o loading
+      setLoading(false);
     }
   }
+  
 
   async function handleSubmitForm(e: FormEvent) {
     e.preventDefault();
@@ -211,38 +219,44 @@ export default function Home() {
             <p className="text-gray-700">Selecione uma mesa para reservar</p>
           )}
 
-          <div className="mt-6">
-            <h2 className="text-xl font-bold mb-4">
-              {isAdmin ? "Todas as Reservas" : "Minhas Reservas"}
-            </h2>
-            <ul>
-              {reservas.map((reserva) => (
-                <li
-                  key={reserva.id}
-                  className="flex justify-between items-center p-4 bg-white shadow mb-2 rounded"
-                >
-                  <div>
-                    <p>
-                      <strong>Mesa:</strong> {reserva.mesa_id}
-                    </p>
-                    <p>
-                      <strong>Data:</strong>{" "}
-                      {new Date(reserva.data).toLocaleDateString()}
-                    </p>
-                    <p>
-                      <strong>Pessoas:</strong> {reserva.n_pessoas}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => handleCancelReserva(reserva.id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                  >
-                    Cancelar
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+<div className="mt-6">
+  <h2 className="text-xl font-bold mb-4">
+    {isAdmin ? "Todas as Reservas" : "Minhas Reservas"}
+  </h2>
+  <ul>
+    {reservas.map((reserva) => (
+      <li
+        key={reserva.id}
+        className="flex justify-between items-center p-4 bg-white shadow mb-2 rounded"
+      >
+        <div>
+          <p>
+            <strong>Mesa:</strong> {reserva.mesa.codigo || reserva.mesa_id}
+          </p>
+          <p>
+            <strong>Cliente:</strong>{" "}
+            {reserva.usuario?.nome || "Usuário não identificado"}
+          </p>
+          <p>
+            <strong>Data:</strong>{" "}
+            {new Date(reserva.data).toLocaleDateString()}
+          </p>
+          <p>
+            <strong>Pessoas:</strong> {reserva.n_pessoas}
+          </p>
+        </div>
+        {isAdmin && (
+          <button
+            onClick={() => handleCancelReserva(reserva.id)}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Cancelar
+          </button>
+        )}
+      </li>
+    ))}
+  </ul>
+</div>
         </div>
       </div>
     </div>
