@@ -1,263 +1,181 @@
 "use client";
-import { useEffect, useState, ChangeEvent, FormEvent } from "react";
+
+import { useEffect, useState, FormEvent } from "react";
+import { parseCookies } from "nookies";
 import NavBar from "../componentes/navbar";
+import styles from "./reserva.module.css"; // Importa o CSS local
 import Mesa from "../interfaces/mesa";
 import Reserva from "../interfaces/reserva";
 
 export default function Home() {
-  const [mesas, setMesas] = useState<Mesa[]>([]); // Inicializado como array vazio
+  const [mesas, setMesas] = useState<Mesa[]>([]);
   const [reservas, setReservas] = useState<Reserva[]>([]);
-  const [formReserva, setFormReserva] = useState<Reserva>({
-    id: 0,
-    usuario_id: 0,
-    mesa_id: 0,
-    data: getDateNow(),
-    n_pessoas: 0,
-    status: true,
-  });
-  const [selectedTable, setSelectedTable] = useState<string | null>(null);
-  const [dateTables, setDateTables] = useState(getDateNow());
-  const [isAdmin, setIsAdmin] = useState(false); // Flag para verificar se é administrador
   const [loading, setLoading] = useState(true);
-
-  function getDateNow() {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  }
-
-  function alterFormReserva<K extends keyof Reserva>(key: K, value: Reserva[K]) {
-    setFormReserva((prevForm) => ({
-      ...prevForm,
-      [key]: value,
-    }));
-  }
+  const [isAdmin, setIsAdmin] = useState(false); // Verifica se o usuário é administrador
+  const [dateTables, setDateTables] = useState(new Date().toISOString().split("T")[0]); // Data selecionada
+  const [formReserva, setFormReserva] = useState({
+    mesaId: 0,
+    n_pessoas: 1,
+    data: "",
+  });
 
   async function fetchData() {
-    setLoading(true);
+    const cookies = parseCookies();
+    const token = cookies["restaurant-token"];
+
     try {
-      // Busca as mesas
-      const responseMesas = await fetch("http://localhost:8000/mesas");
-      if (!responseMesas.ok) throw new Error("Erro ao buscar mesas.");
-  
-      const mesasData = await responseMesas.json();
-      setMesas(mesasData.mesas || mesasData); // Garante que seja um array
-  
-      // Verifica se o usuário é administrador
-      const token = localStorage.getItem("token");
-      const responseReservas = isAdmin
-        ? await fetch(
-            `http://localhost:8000/reservas/list?data=${dateTables}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          )
-        : await fetch("http://localhost:8000/reservas", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-  
-      if (!responseReservas.ok) throw new Error("Erro ao buscar reservas.");
-  
-      const reservasData = await responseReservas.json();
-      setReservas(reservasData.reservas || []);
-      setIsAdmin(reservasData.isAdmin || false);
+      setLoading(true);
+
+      // Buscar mesas disponíveis para a data selecionada
+      const mesasResponse = await fetch(`http://localhost:8000/mesa/disponibilidade?data=${dateTables}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (mesasResponse.ok) {
+        const mesasData = await mesasResponse.json();
+        setMesas(mesasData.mesas || []);
+      }
+
+      // Verificar se o usuário é administrador e buscar reservas
+      const reservasResponse = await fetch(`http://localhost:8000/reservas`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (reservasResponse.ok) {
+        const reservasData = await reservasResponse.json();
+        setReservas(reservasData.reservas || []);
+
+        // Define se o usuário é administrador
+        setIsAdmin(reservasData.isAdmin || false);
+      }
     } catch (error) {
-      console.error("Erro ao buscar dados:", error.message);
-      setMesas([]);
-      setReservas([]);
+      console.error("Erro ao buscar dados:", error);
     } finally {
       setLoading(false);
     }
   }
-  
 
-  async function handleSubmitForm(e: FormEvent) {
-    e.preventDefault();
+  // Busca reservas por data (para administradores)
+  async function fetchReservasPorData() {
+    const cookies = parseCookies();
+    const token = cookies["restaurant-token"];
+
     try {
-      await fetch("http://localhost:8000/reservas", {
+      const response = await fetch(`http://localhost:8000/reservas/list?data=${dateTables}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setReservas(data.reservas || []);
+      } else {
+        console.error("Erro ao buscar reservas por data.");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar reservas por data:", error);
+    }
+  }
+
+  async function handleNovaReserva(e: FormEvent) {
+    e.preventDefault();
+    const cookies = parseCookies();
+    const token = cookies["restaurant-token"];
+
+    try {
+      const response = await fetch(`http://localhost:8000/reservas/novo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formReserva),
       });
 
-      fetchData(); // Atualiza dados após a reserva
+      if (response.ok) {
+        fetchData();
+      } else {
+        console.error("Erro ao criar reserva");
+      }
     } catch (error) {
-      console.error("Erro ao criar reserva:", error.message);
+      console.error("Erro ao criar reserva:", error);
     }
   }
 
-  async function handleCancelReserva(id: number) {
-    try {
-      await fetch(`http://localhost:8000/reservas/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-
-      fetchData(); // Atualiza dados após cancelamento
-    } catch (error) {
-      console.error("Erro ao cancelar reserva:", error.message);
-    }
-  }
-
-  function handleChangeDate(e: ChangeEvent<HTMLInputElement>) {
+  function handleChangeDate(e: React.ChangeEvent<HTMLInputElement>) {
     setDateTables(e.target.value);
-    alterFormReserva("data", e.target.value);
   }
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [dateTables]);
 
   if (loading) {
-    return <p>Carregando...</p>;
+    return <p className={styles.loading}>Carregando...</p>;
   }
 
   return (
     <div>
       <NavBar />
-      <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
-        <div className="w-full lg:w-1/4 text-white p-4 flex items-center">
-          <div className="bg-white text-gray-800 rounded-lg shadow-lg p-4 w-full max-w-sm">
-            <img
-              src="/usuario.jpeg"
-              alt="Usuário"
-              className="w-24 h-24 mx-auto rounded-full border-4 border-indigo-500"
-            />
-            <h2 className="text-center text-lg font-bold mt-4">
-              Nome do Usuário
-            </h2>
-            <p className="text-center text-gray-600">
-              {isAdmin ? "Administrador" : "Cliente"}
-            </p>
-          </div>
-        </div>
+      <div className={styles.container}>
+        <h1 className={styles.h1}>Reservas</h1>
 
-        <div className="w-full lg:w-1/2 bg-white p-6">
-          <div>
-            <h2 className="text-xl font-bold mb-4">Mesas Disponíveis</h2>
-            <label className="flex flex-col">
-              <input
-                type="date"
-                value={dateTables}
-                min={dateTables}
-                className="p-2 border rounded"
-                onChange={handleChangeDate}
-              />
-            </label>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
-            {Array.isArray(mesas) &&
-              mesas.map((table) => {
-                const isReserved = reservas.some(
-                  (reserva) =>
-                    dateTables === reserva.data && reserva.mesa_id === table.id
-                );
-
-                return (
-                  <button
-                    key={table.id}
-                    className={`p-4 text-white rounded-lg ${
-                      isReserved
-                        ? "bg-red-500 hover:bg-red-600 focus:bg-red-700"
-                        : "bg-indigo-500 hover:bg-indigo-600 focus:bg-indigo-700"
-                    }`}
-                    onClick={() => {
-                      if (!isReserved) {
-                        alterFormReserva("mesa_id", table.id);
-                        setSelectedTable(table.nome);
-                      }
-                    }}
-                    disabled={isReserved}
-                  >
-                    {table.nome}
-                  </button>
-                );
-              })}
-          </div>
-        </div>
-
-        <div className="w-full lg:w-1/4 bg-gray-100 p-4 border-t lg:border-t-0 lg:border-l">
-          {selectedTable ? (
-            <div>
-              <h2 className="text-xl font-bold mb-4">Reservar {selectedTable}</h2>
-              <form className="flex flex-col space-y-4" onSubmit={handleSubmitForm}>
-                <label className="flex flex-col">
-                  User ID:
-                  <input
-                    type="number"
-                    className="p-2 border rounded"
-                    placeholder="ID"
-                    onChange={(e) =>
-                      alterFormReserva("usuario_id", parseInt(e.target.value))
-                    }
-                  />
-                </label>
-                <label className="flex flex-col">
-                  Pessoas:
-                  <input
-                    type="number"
-                    max={4}
-                    min={1}
-                    onChange={(e) =>
-                      alterFormReserva("n_pessoas", parseInt(e.target.value))
-                    }
-                    className="p-2 border rounded"
-                  />
-                </label>
-                <button
-                  type="submit"
-                  className="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 focus:outline-none focus:bg-indigo-700"
-                >
-                  Confirmar Reserva
-                </button>
-              </form>
-            </div>
-          ) : (
-            <p className="text-gray-700">Selecione uma mesa para reservar</p>
-          )}
-
-<div className="mt-6">
-  <h2 className="text-xl font-bold mb-4">
-    {isAdmin ? "Todas as Reservas" : "Minhas Reservas"}
-  </h2>
-  <ul>
-    {reservas.map((reserva) => (
-      <li
-        key={reserva.id}
-        className="flex justify-between items-center p-4 bg-white shadow mb-2 rounded"
-      >
-        <div>
-          <p>
-            <strong>Mesa:</strong> {reserva.mesa.codigo || reserva.mesa_id}
-          </p>
-          <p>
-            <strong>Cliente:</strong>{" "}
-            {reserva.usuario?.nome || "Usuário não identificado"}
-          </p>
-          <p>
-            <strong>Data:</strong>{" "}
-            {new Date(reserva.data).toLocaleDateString()}
-          </p>
-          <p>
-            <strong>Pessoas:</strong> {reserva.n_pessoas}
-          </p>
-        </div>
+        {/* Exibe o botão de buscar reservas por data apenas para administradores */}
         {isAdmin && (
-          <button
-            onClick={() => handleCancelReserva(reserva.id)}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            Cancelar
-          </button>
+          <>
+            <h2 className={styles.titulo}>Buscar Reservas por Data</h2>
+            <input
+              type="date"
+              value={dateTables}
+              onChange={handleChangeDate}
+              className={styles.input}
+            />
+            <button className={styles.button} onClick={fetchReservasPorData}>
+              Buscar Reservas
+            </button>
+          </>
         )}
-      </li>
-    ))}
-  </ul>
-</div>
+
+        {/* Lista de reservas */}
+        <h2 className={styles.titulo}>{isAdmin ? "Todas as Reservas" : "Minhas Reservas"}</h2>
+        <ul className={styles.reservasList}>
+          {reservas.map((reserva) => (
+            <li key={reserva.id} className={styles.reservaItem}>
+              <p>Mesa: {reserva.mesa.codigo || reserva.mesaId}</p>
+              <p>Data: {new Date(reserva.data).toLocaleDateString()}</p>
+              <p>Pessoas: {reserva.n_pessoas}</p>
+              {isAdmin && <p>Cliente: {reserva.usuario?.nome || "Não identificado"}</p>}
+            </li>
+          ))}
+        </ul>
+
+        {/* Mesas disponíveis */}
+        <h2 className={styles.titulo}>Mesas Disponíveis</h2>
+        <div className={styles.mesas}>
+          {mesas.map((mesa) => (
+            <button
+              key={mesa.id}
+              className={styles.mesa}
+              onClick={() => setFormReserva({ ...formReserva, mesaId: mesa.id, data: dateTables })}
+            >
+              Mesa {mesa.codigo} - {mesa.n_lugares} lugares
+            </button>
+          ))}
         </div>
+
+        {/* Formulário para criar nova reserva */}
+        <form onSubmit={handleNovaReserva} className={styles.form}>
+          <label className={styles.label}>Número de Pessoas:</label>
+          <input
+            type="number"
+            className={styles.input}
+            min={1}
+            max={mesas.find((m) => m.id === formReserva.mesaId)?.n_lugares || 1}
+            value={formReserva.n_pessoas}
+            onChange={(e) => setFormReserva({ ...formReserva, n_pessoas: Number(e.target.value) })}
+          />
+          <button type="submit" className={styles.button}>
+            Reservar
+          </button>
+        </form>
       </div>
     </div>
   );

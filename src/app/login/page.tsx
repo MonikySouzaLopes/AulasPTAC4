@@ -2,8 +2,8 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { ApiURL } from '../config';
-import styles from "./login.module.css";
-import Link from "next/link";
+import styles from './login.module.css';
+import Link from 'next/link';
 import NavBar from '../componentes/navbar';
 import { setCookie } from 'nookies';
 
@@ -22,8 +22,13 @@ export default function Login() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      setErroLogin('Por favor, preencha todos os campos.');
+    if (!email.includes('@')) {
+      setErroLogin('Por favor, insira um email válido.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setErroLogin('A senha deve ter pelo menos 6 caracteres.');
       return;
     }
 
@@ -46,9 +51,13 @@ export default function Login() {
       if (erro) {
         setErroLogin(mensagem);
       } else {
+        // Salva o token no cookie
         setCookie(undefined, 'restaurant-token', token, {
           maxAge: 60 * 60 * 1, // 1 hora
+          path: '/', // Acessível em todas as rotas
         });
+
+        // Redireciona para a página principal
         router.push('/');
       }
     } catch (error) {
