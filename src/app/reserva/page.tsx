@@ -53,6 +53,35 @@ export default function Home() {
       setLoading(false);
     }
   }
+  async function handleCancelarReserva(reservaId: number) {
+    const cookies = parseCookies();
+    const token = cookies["restaurant-token"];
+  
+    if (window.confirm("Tem certeza de que deseja cancelar esta reserva?")) {
+      try {
+        const response = await fetch(`http://localhost:8000/reservas`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ reservaId }),
+        });
+  
+        if (response.ok) {
+          alert("Reserva cancelada com sucesso!");
+          fetchData(); // Atualiza os dados na tela
+        } else {
+          const errorData = await response.json();
+          alert(errorData.mensagem || "Erro ao cancelar a reserva.");
+        }
+      } catch (error) {
+        console.error("Erro ao cancelar reserva:", error);
+        alert("Erro ao cancelar a reserva. Tente novamente.");
+      }
+    }
+  }
+  
 
   // Busca reservas por data (para administradores)
   async function fetchReservasPorData() {
@@ -136,17 +165,24 @@ export default function Home() {
 
         {/* Lista de reservas */}
         <h2 className={styles.titulo}>{isAdmin ? "Todas as Reservas" : "Minhas Reservas"}</h2>
-        <ul className={styles.reservasList}>
-          {reservas.map((reserva) => (
-            <li key={reserva.id} className={styles.reservaItem}>
-              <p>Mesa: {reserva.mesa.codigo || reserva.mesaId}</p>
-              <p>Data: {new Date(reserva.data).toLocaleDateString()}</p>
-              <p>Pessoas: {reserva.n_pessoas}</p>
-              {isAdmin && <p>Cliente: {reserva.usuario?.nome || "Não identificado"}</p>}
-            </li>
-          ))}
-        </ul>
+<ul className={styles.reservasList}>
+  {reservas.map((reserva) => (
+    <li key={reserva.id} className={styles.reservaItem}>
+      <p>Mesa: {reserva.mesa.codigo || reserva.mesaId}</p>
+      <p>Data: {new Date(reserva.data).toLocaleDateString()}</p>
+      <p>Pessoas: {reserva.n_pessoas}</p>
+      {isAdmin && <p>Cliente: {reserva.usuario?.nome || "Não identificado"}</p>}
 
+      {/* Botão de Cancelar */}
+      <button
+        className={styles.cancelButton}
+        onClick={() => handleCancelarReserva(reserva.id)}
+      >
+        Cancelar
+      </button>
+    </li>
+  ))}
+</ul>
         {/* Mesas disponíveis */}
         <h2 className={styles.titulo}>Mesas Disponíveis</h2>
         <div className={styles.mesas}>

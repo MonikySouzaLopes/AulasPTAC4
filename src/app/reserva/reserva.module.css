@@ -106,3 +106,18 @@
   font-size: 1.2rem;
   color: #555;
 }
+
+.cancelButton {
+  background-color: #ff4d4d; /* Vermelho para simbolizar exclusão */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.cancelButton:hover {
+  background-color: #cc0000; /* Tom mais escuro de vermelho ao passar o mouse */
+}
