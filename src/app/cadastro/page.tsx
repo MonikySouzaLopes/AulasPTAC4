@@ -2,7 +2,7 @@
 import React, { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { ApiURL } from '../config';
-import Usuario from '../interfaces/usuario2';
+import Usuario from '../interfaces/usuario';
 import styles from "./page.module.css"; 
 import NavBar from '../componentes/navbar';
 
