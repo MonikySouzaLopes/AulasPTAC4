@@ -48,11 +48,11 @@ export default function Menu({ user }: MenuProps) {
                 </div>
             ) : (
                 <div className="mt-4 space-y-2 w-full flex flex-wrap gap-2">
-                    <Link href={'/reservas/novo'} className="flex items-center bg-white text-gray-800 w-full py-2 px-4 shadow-md rounded-lg hover:bg-slate-300 transition-colors">
+                    <Link href={'/reserva/novo'} className="flex items-center bg-white text-gray-800 w-full py-2 px-4 shadow-md rounded-lg hover:bg-slate-300 transition-colors">
                         <ClipboardList className="w-5 h-5 mr-2"/>
                         Nova Reserva
                     </Link>
-                    <Link href={'/reservas'} className="flex items-center bg-white text-gray-800 w-full py-2 px-4 shadow-md rounded-lg hover:bg-slate-300 transition-colors">
+                    <Link href={'/reserva'} className="flex items-center bg-white text-gray-800 w-full py-2 px-4 shadow-md rounded-lg hover:bg-slate-300 transition-colors">
                         <ClipboardList className="w-5 h-5 mr-2"/>
                         Minhas Reservas
                     </Link>
