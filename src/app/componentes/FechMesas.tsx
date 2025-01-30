@@ -1,5 +1,5 @@
 export function FetchMesas() {
-    const response = await fetch('http://localhost:3333/reservas')
+    const response = await fetch('http://localhost:8000/mesa')
     return (
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">

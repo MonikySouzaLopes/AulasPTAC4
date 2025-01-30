@@ -1,8 +1,9 @@
 'use server'
 
 import{cookies} from "next/headers"
-import {ApiURL} from "./config"
+import { ApiURL } from "../config";
 import Reserva from "../interfaces/reserva";
+import { getDefaultResultOrder } from "dns";
 
 
 export async function fetchReserva(data: string): Promise<Reserva[] | {erro: boolean, mensagem: string}>{
@@ -32,6 +33,34 @@ export async function fetchReserva(data: string): Promise<Reserva[] | {erro: boo
     } catch (error) {
       console.error("Erro na requisição getMesa:", error);
       return []; // Em caso de erro, retorna array vazio
+    }
+  }
+  
+export async function fetchNovaReserva(mesaId: number, n_pessoas: number, data: string): Promise<Reserva[] | {erro: boolean, mensagem: string}>{
+  const cookieStore = await cookies(); 
+  const token = cookieStore.get("restaurant-token");  
+  console.log(data)
+    if(!data || !n_pessoas || !mesaId || !token){
+        return {erro: true, mensagem: 'Dados inválidos'}
+    }
+    try {
+      const res = await fetch(`${ApiURL}/reservas/novo`, {
+        method: "POST",
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token?.value}` },
+        body: JSON.stringify({data, mesaId, n_pessoas})
+      });
+  
+      const dataRes = await res.json();
+      const {erro, mensagem} = dataRes
+      return {
+        erro,
+        mensagem
+      }
+    } catch (error) {
+      console.log(error);
+      return {erro: true, mensagem: 'Erro ao fazer requisição'}
     }
   }
   
