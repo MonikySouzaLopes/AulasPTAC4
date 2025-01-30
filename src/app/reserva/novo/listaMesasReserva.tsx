@@ -12,6 +12,7 @@ export function ListMesasReserva({mesas}: ListMesasReservaProps){
        const [data, setData] = useState('')
        const [reservas, setReservas] = useState<Reserva[] | null>(null)
        const [loadReservas, setLoadReservas] = useState(false)
+       const [mesaS, setMesaS] = useState<Mesa | null>(null)
 
        async function handleFecthData(){
         setLoadReservas(true)
@@ -69,7 +70,16 @@ export function ListMesasReserva({mesas}: ListMesasReservaProps){
             }
             </div>
          </div>
+
+    {mesaS && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-1/3">
+
+        </div>  
+        
      </div>
-   )
+   )}
+</div>   
+    )
 
 }
