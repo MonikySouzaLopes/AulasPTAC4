@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { ApiURL } from "../config";
 
 export async function getUser() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("restaurant-token");
 
   if (!token) {

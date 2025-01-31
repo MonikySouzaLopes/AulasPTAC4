@@ -9,6 +9,7 @@ import { getUser } from "../utils/serverActions"; // Importação corrigida
 export default function Reservas() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
     async function fetchData() {

@@ -1,21 +1,21 @@
+'use server'
 
-import PerfilDaMesa from '../interfaces/mesa';
+import { redirect } from "next/navigation"
+import { getUser } from "../utils/serverActions"
+import Menu from "../componentes/menu"
+import { ListMesas } from "./listMesas"
+import { getMesa } from "../utils/mesas"
 
 
-const PaginaMesa = () =>{
-    const mesa = {
-        id: 1,
-        codigo: '098',
-        n_lugares: 6,
-
-    }
-    return (
-        <div>
-            <h1>Página Mesa</h1>
-            <PerfilDaMesa mesa={mesa}/>
-         
-        </div>
-    )
+export default async function Mesas() {
+    const user = await getUser()
+    const mesas = await getMesa()
+    if(!user || user.tipo === "cliente" || !mesas) redirect('/')
+    
+        return(
+            <div className="min-h-sreen bg-gray-100 flex flex-col lg:flex-row">
+                <Menu user={user}/>
+                <ListMesas mesas={mesas}/>
+            </div>
+        )
 }
-
-export default PaginaMesa
